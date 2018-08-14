@@ -15,7 +15,7 @@ Seas::~Seas()
 }
 
 void Seas::LoadShip(Entity* ship, int loops) {
-	int x = Helpers.RandomizeBetween(0, 9);
+	int x = RandomizeBetween(0, 9);
 	int y = RandomizeBetween(0, 9);
 	int direct = RandomizeBetween(0, 3);
 	loops = loops + 1;

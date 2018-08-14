@@ -13,7 +13,7 @@ int main()
 	string player_input = "";
 
 	//fill sea with ships
-	LoadShips();
+	seas.LoadShips();
 
 	//loop through game render
 	while (1) {
