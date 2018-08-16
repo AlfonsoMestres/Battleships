@@ -5,12 +5,12 @@
 
 using namespace std;
 
-class Entity
+class Ship
 {
 
 public:
-	Entity(int shipNumber, int size);
-	virtual ~Entity();
+	Ship(int shipNumber, int size);
+	virtual ~Ship();
 
 	int shipNumber;
 	int size;
