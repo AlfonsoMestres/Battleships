@@ -9,10 +9,10 @@ class Ship
 {
 
 public:
-	Ship(int shipNumber, int size);
+	Ship(char shipLetter, int size);
 	virtual ~Ship();
 
-	int shipNumber;
+	char shipLetter;
 	int size;
 
 };
