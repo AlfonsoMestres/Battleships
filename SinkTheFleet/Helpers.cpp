@@ -1,5 +1,6 @@
 #include <array>
 #include <random>
+#include <cctype>
 #include "Helpers.h"
 
 ///c++ 11 Randomizer style
@@ -12,4 +13,10 @@ int RandomizeBetween(int min, int max) {
 	std::uniform_int_distribution<int> dist(min, max);
 	//then just generate the integer like this:
 	return dist(engine);
+}
+
+///c++ 11 check if its a number style
+bool is_number(const std::string& s)
+{
+	return !s.empty() && std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 }

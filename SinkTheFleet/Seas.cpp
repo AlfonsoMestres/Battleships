@@ -162,6 +162,7 @@ bool Seas::LoadShips(int mode) {
 }
 
 void Seas::SeaStatus() {
+	//TODO: We need to be able to see our see and the enemy sea when finished the game or GaveUp
 	int rows = sizeof(playerSea) / sizeof(playerSea[0]);
 	int cols = sizeof(playerSea[0]) / sizeof(playerSea[0][0]);
 
@@ -181,10 +182,24 @@ void Seas::SeaStatus() {
 }
 
 void Seas::ClearSea() {
-	//This will be removed due new sea with chars instead of ints
-	//memset(sea, 0, sizeof(sea));
 	memset(&sea, '*', sizeof(sea));
 	memset(&playerSea, '*', sizeof(playerSea));
+}
+
+void Seas::ReloadGame() {
+	int option;
+
+	//TODO: Fix this so the difficulty option wont display the "not an option" selection
+	while (1) {
+		cout << "0- EASY" << endl;
+		cout << "1- NORMAL" << endl;
+		cout << "2- HARD" << endl;
+		cin >> option;
+		ClearSea();
+		if (LoadShips(option))
+			break;
+	}
+
 }
 
 void Seas::UpdatePlayerSea(int col, int row) {
@@ -211,4 +226,54 @@ void Seas::HitLocation(int col, int row) {
 	} else if (playerSea[col][row] == '*') { 
 		UpdatePlayerSea(col,row);
 	}
+	//Check if the missile sink the last ship to set the Win condition
+}
+
+bool Seas::DoAction(string action) {
+	bool ret = true;
+
+	vector<string> parsedAction = ParseAction(action);
+
+	switch (parsedAction.size()) {
+		case 1:
+			if (parsedAction[0] == "restart") {
+				ReloadGame();
+			}
+			else
+				ret = false;
+			break;
+		case 2:
+			if (is_number(parsedAction[0]) && is_number(parsedAction[1])) {
+				int col = atoi(parsedAction[0].c_str());
+				int row = atoi(parsedAction[1].c_str());
+				HitLocation(col, row);
+			}
+			break;
+		default:
+			ret = false;
+			break;
+	}
+
+	return ret;
+}
+
+///Take the input and split them into parts so we can manage them clearly
+vector<string> Seas::ParseAction(string args) //Filling new memory slots with ducplicate content is wasting memory, we should avoid this in next steps and make it directly
+{
+	int len = args.length();
+	vector<string> subArray;
+
+	for (int j = 0, k = 0; j < len; j++) {
+		if (args[j] == ' ') {
+			string ch = args.substr(k, j - k);
+			k = j + 1;
+			subArray.push_back(ch);
+		}
+		if (j == len - 1) {
+			string ch = args.substr(k, j - k + 1);
+			subArray.push_back(ch);
+		}
+	}
+
+	return subArray;
 }
