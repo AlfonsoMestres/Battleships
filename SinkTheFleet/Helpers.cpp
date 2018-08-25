@@ -1,3 +1,5 @@
+#include <iostream>
+#include <string>
 #include <array>
 #include <random>
 #include <cctype>
@@ -19,4 +21,22 @@ int RandomizeBetween(int min, int max) {
 bool is_number(const std::string& s)
 {
 	return !s.empty() && std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+}
+
+int inputNumberBetween(std::string prompt, int min, int max) {
+	int guess = -1;
+
+	do {
+		std::cout << prompt;
+		std::cin >> guess;
+		if (guess < min || guess > max)
+		{
+			guess = -1;
+			std::cin.clear();
+			std::cin.ignore(256, '\n');
+			std::cout << "Out of Range!" << std::endl;
+		}
+	} while (guess == -1);
+
+	return guess;
 }
