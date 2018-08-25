@@ -19,11 +19,11 @@ int main()
 
 	//Loop through game render
 	while (1) {
-		seas.SeaStatus(seas.playerSea, "Player");
-		getline(cin, player_input); //TODO: Should edit functions to work for the AI and the player
+		seas.GameState();
+		getline(cin, player_input);
 		system("cls");
 
-		if (player_input == "exit") {
+		if (seas.DoAction(player_input)) {
 			system("cls");
 			cout << "You gave up!" << endl;
 			cout << "This is the sea status! Arrrr" << endl;
@@ -31,9 +31,6 @@ int main()
 			seas.SeaStatus(seas.aiSea, "AI");
 			break;
 		}
-
-		if (seas.DoAction(player_input) == false)
-			cout << "Not an option" << endl;
 
 	}
 

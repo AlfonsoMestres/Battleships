@@ -169,7 +169,7 @@ bool Seas::LoadShips(int mode) {
 
 const void Seas::SeaStatus(std::vector<std::vector<char>>& sea, string seaPrompt) {
 
-	std::cout << "----" << seaPrompt << " Sea ----" << std::endl;
+	std::cout << "----" << seaPrompt << " Sea----" << std::endl;
 
 	std::cout << ' ';
 	for (int l = 0; l < sea.size(); l++) {
@@ -199,7 +199,6 @@ void Seas::ReloadGame() {
 		std::cout << "1- NORMAL" << std::endl;
 		std::cout << "2- HARD" << std::endl;
 		std::cin >> option;
-		/*ClearSea();*/
 		if (LoadShips(option))
 			break;
 	}
@@ -224,38 +223,34 @@ bool Seas::HitLocation(std::vector<std::vector<char>>& guessSea, std::vector<std
 	return ret;
 }
 
+void const Seas::GameState() {
+	std::cout << "    GAME  STATE    " << std::endl;
+	SeaStatus(playerSea, "Your");
+	SeaStatus(playerGuessSea, "Enemy");
+	std::cout << "A = Attack | R = Restart | Q = Quit" << std::endl;
+}
+
 void Seas::LaunchMissile() {
 	bool properMissileLaunched = false;
 	
 	while (!properMissileLaunched) {
+		GameState();
 		col = inputNumberBetween("Col: ", 0, aiSea.size());
 		row = inputNumberBetween("Row: ", 0, aiSea.size());
 		properMissileLaunched = HitLocation(playerGuessSea, aiSea, col, row);
+		system("cls"); 
 	}
 }
 
 bool Seas::DoAction(string action) {
-	bool ret = true;
-
-	vector<string> parsedAction = ParseAction(action);
-
-	switch (parsedAction.size()) {
-		case 1:
-			if (parsedAction[0] == "restart") {
-				ReloadGame();
-			}
-			else
-				ret = false;
-			break;
-		case 2:
-			LaunchMissile();
-			break;
-		default:
-			ret = false;
-			break;
+	if (action == "R" || action == "restart") {
+		ReloadGame();
+	} else if (action == "A" || action == "attack") {
+		LaunchMissile();
 	}
-
-	return ret;
+	else if (action == "Q" || action == "quit") {
+		return true;
+	}
 }
 
 ///Take the input and split them into parts so we can manage them clearly

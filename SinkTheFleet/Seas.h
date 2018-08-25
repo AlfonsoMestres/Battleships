@@ -9,27 +9,26 @@ public:
 	Seas();
 	virtual ~Seas();
 
-	void InitNewSeas(unsigned int size);
-	//void InitSea(std::vector<std::vector<char>>& playingBoard, int rows);
-	bool LoadShip(std::vector<std::vector<char>>& sea, Ship* ship, int col, int row, bool direct);
-	void LoadAIShips(Ship* ship);
-	void LoadPlayerShips(Ship* ship);
-	bool LoadShips(int mode);
-	const void SeaStatus(std::vector<std::vector<char>>& sea, string seaPrompt);
+	int col, row;
 	bool DoAction(string action);
-	void ReloadGame();
-	void LaunchMissile();
+	const void SeaStatus(std::vector<std::vector<char>>& sea, string seaPrompt);
+	const void GameState();
 
 	std::vector<std::vector<char>> aiSea;
 	std::vector<std::vector<char>> playerSea;
 	std::vector<std::vector<char>> aiGuessSea;
 	std::vector<std::vector<char>> playerGuessSea;
 
-	int lastColHit, col, row, lastRowHit;
-
 private:
-	bool HitLocation(std::vector<std::vector<char>>& guessSea, std::vector<std::vector<char>>& enemySea, int col, int row);
+	void ReloadGame();
+	void LaunchMissile();
+	bool LoadShips(int mode);
+	void LoadAIShips(Ship* ship);
+	void LoadPlayerShips(Ship* ship);
+	void InitNewSeas(unsigned int size);
 	vector<string> ParseAction(string args);
+	bool LoadShip(std::vector<std::vector<char>>& sea, Ship* ship, int col, int row, bool direct);
+	bool HitLocation(std::vector<std::vector<char>>& guessSea, std::vector<std::vector<char>>& enemySea, int col, int row);
 
 };
 
