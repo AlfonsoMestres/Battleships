@@ -17,7 +17,6 @@ Seas::~Seas()
 {
 }
 
-
 std::vector<std::vector<char>> CreateBoard(char fill_value, unsigned int seaSize)
 {
 	std::vector<char> vec (seaSize, fill_value);
@@ -85,14 +84,14 @@ void Seas::LoadPlayerShips(Ship* ship) {
 
 	while (!shipsPlaced) {
 		SeaStatus(playerSea, "Player");
-		cout << "Locate the ship " << ship->shipLetter << " with size " << ship->size << " in your sea." << endl;
-		cout << "Col: ", cin >> x, cout << "Row: ", cin >> y;
-		cout << "Now introduce the direction (0 Vertical, 1 Horizontal): ", cin >> direct;  //TODO: If wrong option selected, bugs happens
+		std::cout << "Locate the ship " << ship->shipLetter << " with size " << ship->size << " in your sea." << std::endl;
+		x = inputNumberBetween("Col: ", 0, aiSea.size());
+		y = inputNumberBetween("Row: ", 0, aiSea.size());
+		direct = inputNumberBetween("Direction (0 Horizontal / 1 Vertical): ", 0, 1);
 		shipsPlaced = LoadShip(playerSea, ship, x, y, direct);
 		if (!shipsPlaced)
-			std::cout << "Position invalid!" << endl; 
+			std::cout << "Position invalid!" << std::endl;
 	}
-
 	
 }
 
@@ -155,9 +154,6 @@ bool Seas::LoadShips(int mode) {
 
 	InitNewSeas(size);
 
-	//Debug info
-	std::cout << "Iterations to find a spot -------------------" << endl;
-
 	for (std::vector<Ship*>::iterator it = ships.begin(); it != ships.end(); ++it)
 		LoadAIShips((Ship*)*it);
 
@@ -173,14 +169,14 @@ bool Seas::LoadShips(int mode) {
 
 const void Seas::SeaStatus(std::vector<std::vector<char>>& sea, string seaPrompt) {
 
-	cout << "----" << seaPrompt << " Sea ----" << endl;
+	std::cout << "----" << seaPrompt << " Sea ----" << std::endl;
 
 	std::cout << ' ';
 	for (int l = 0; l < sea.size(); l++) {
 		std::cout << ' ' << l;
 	}
 
-	std::cout << endl;
+	std::cout << std::endl;
 
 	for (int j = 0; j < sea.size(); j++)
 	{
@@ -189,27 +185,20 @@ const void Seas::SeaStatus(std::vector<std::vector<char>>& sea, string seaPrompt
 		{
 			std::cout << sea[i][j] << " ";
 		}
-		std::cout << endl;
+		std::cout << std::endl;
 	}
-	std::cout << endl;
+	std::cout << std::endl;
 }
-
-//void Seas::ClearSea() {
-//	memset(&aiSea, '*', sizeof(aiSea));
-//	memset(&playerSea, '*', sizeof(playerSea));
-//	memset(&playerGuessSea, '*', sizeof(playerGuessSea));
-//	memset(&aiGuessSea, '*', sizeof(aiGuessSea));
-//}
 
 void Seas::ReloadGame() {
 	int option;
 
 	//TODO: Fix this so the difficulty option wont display the "not an option" selection
 	while (1) {
-		cout << "0- EASY" << endl;
-		cout << "1- NORMAL" << endl;
-		cout << "2- HARD" << endl;
-		cin >> option;
+		std::cout << "0- EASY" << std::endl;
+		std::cout << "1- NORMAL" << std::endl;
+		std::cout << "2- HARD" << std::endl;
+		std::cin >> option;
 		/*ClearSea();*/
 		if (LoadShips(option))
 			break;
@@ -218,22 +207,31 @@ void Seas::ReloadGame() {
 	cin.clear();
 }
 
-void Seas::UpdatePlayerSea(int col, int row) {
-	if (aiSea[col][row] != '*') {
-		cout << "You hit a ship!" << endl;
-		playerGuessSea[col][row] = 'X';
+bool Seas::HitLocation(std::vector<std::vector<char>>& guessSea, std::vector<std::vector<char>>& enemySea, int col, int row) {
+	bool ret = false;
+	if (guessSea[col][row] == '*') {
+		if (enemySea[col][row] != '*') {
+			std::cout << "You hit a ship!" << std::endl;
+			guessSea[col][row] = 'X';
+		} else {
+			std::cout << "Nothing there" << std::endl;
+			guessSea[col][row] = 'O';
+		}
+		ret = true;
 	} else {
-		cout << "Nothing there" << endl;
-		playerGuessSea[col][row] = 'O';
+		std::cout << "This spot has been hit before, chose other location" << std::endl;
 	}
+	return ret;
 }
 
-//TOOD: FUTURE change '*' to an enum like seaState::WATER
-void Seas::HitLocation(int col, int row) {
-	if (playerGuessSea[col][row] == '*')  
-		UpdatePlayerSea(col, row);
-	else
-		std::cout << "This spot has been hit before, chose other location" << endl;
+void Seas::LaunchMissile() {
+	bool properMissileLaunched = false;
+	
+	while (!properMissileLaunched) {
+		col = inputNumberBetween("Col: ", 0, aiSea.size());
+		row = inputNumberBetween("Row: ", 0, aiSea.size());
+		properMissileLaunched = HitLocation(playerGuessSea, aiSea, col, row);
+	}
 }
 
 bool Seas::DoAction(string action) {
@@ -250,9 +248,7 @@ bool Seas::DoAction(string action) {
 				ret = false;
 			break;
 		case 2:
-			col = inputNumberBetween("Col: ", 0, aiSea.size());
-			row = inputNumberBetween("Row: ", 0, aiSea.size());
-			HitLocation(col, row);
+			LaunchMissile();
 			break;
 		default:
 			ret = false;

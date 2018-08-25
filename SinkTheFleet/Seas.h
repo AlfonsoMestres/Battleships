@@ -16,10 +16,9 @@ public:
 	void LoadPlayerShips(Ship* ship);
 	bool LoadShips(int mode);
 	const void SeaStatus(std::vector<std::vector<char>>& sea, string seaPrompt);
-	/*void ClearSea();*/
-	void UpdatePlayerSea(int row, int col);
 	bool DoAction(string action);
 	void ReloadGame();
+	void LaunchMissile();
 
 	std::vector<std::vector<char>> aiSea;
 	std::vector<std::vector<char>> playerSea;
@@ -29,7 +28,7 @@ public:
 	int lastColHit, col, row, lastRowHit;
 
 private:
-	void HitLocation(int row, int col);
+	bool HitLocation(std::vector<std::vector<char>>& guessSea, std::vector<std::vector<char>>& enemySea, int col, int row);
 	vector<string> ParseAction(string args);
 
 };
