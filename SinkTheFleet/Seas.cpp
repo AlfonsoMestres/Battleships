@@ -8,7 +8,6 @@
 #include "Helpers.h"
 #include "Seas.h"
 
-
 Seas::Seas()
 {
 }
@@ -17,26 +16,10 @@ Seas::~Seas()
 {
 }
 
+
 std::vector<std::vector<char>> CreateBoard(char fill_value, unsigned int seaSize) {
 	std::vector<char> vec (seaSize, fill_value);
 	return { seaSize, vec };
-}
-
-//TODO: Something is wrong here, not checking last row or last col, maybe the -1 or somethig
-bool Seas::WinConditionAchieved(std::vector<std::vector<char>>& sea) {
-	//TODO: This should check only a new parameter in the ship class regarding if its sunk or not, this is not optimal
-	//also the ships should have owners to avoid confusions (maybe)
-
-	//Check if theres more ships on the sea that doesnt belong to a letter
-	for (int i = 0; i < sea.size() - 1; i++) {
-		for (int j = 0; j < sea.size() - 1; j++) {
-			if (sea[j][i] != '*' && sea[j][i] != 'X') { //There's a ship in the sea?
-				return false;
-			}
-		}
-	}
-
-	return true;
 }
 
 void Seas::InitNewSeas(unsigned int size) {
@@ -44,6 +27,22 @@ void Seas::InitNewSeas(unsigned int size) {
 	playerSea = CreateBoard('*', size);
 	aiGuessSea = CreateBoard('*', size);
 	playerGuessSea = CreateBoard('*', size);
+}
+
+bool Seas::WinConditionAchieved(std::vector<std::vector<char>>& sea) {
+	//TODO: This should check only a new parameter in the ship class regarding if its sunk or not, this is not optimal
+	//also the ships should have owners to avoid confusions (maybe)
+
+	//Check if theres more ships on the sea that doesnt belong to a letter
+	for (int i = 0; i < sea.size() - 1; i++) {
+		for (int j = 0; j < sea.size() - 1; j++) {
+			if (sea[i][j] != '*' && sea[i][j] != 'X') {
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 bool Seas::LoadShip(std::vector<std::vector<char>>& sea, Ship* ship, int col, int row, bool direct) {
@@ -109,7 +108,7 @@ void Seas::LoadPlayerShips(Ship* ship) {
 	}
 }
 
-bool Seas::LoadShips(int mode) {
+bool Seas::LoadGame(int mode) {
 	vector<Ship*> ships;
 	Ship* ship1;
 	Ship* ship2;
@@ -201,7 +200,7 @@ void Seas::ReloadGame() {
 		std::cout << "1- NORMAL" << std::endl;
 		std::cout << "2- HARD" << std::endl;
 		std::cin >> option;
-		if (LoadShips(option))
+		if (LoadGame(option))
 			break;
 	}
 
@@ -245,6 +244,37 @@ void Seas::LaunchMissile() {
 		row = inputNumberBetween("Row: ", 0, aiSea.size());
 		properMissileLaunched = HitLocation(playerGuessSea, aiSea, col, row);
 		system("cls"); 
+	}
+}
+
+void Seas::AITurn() {
+	if(lastHitRow != NULL) {
+		if (lastDirectionHit == NULL) {
+			lastDirectionHit = RandomizeBetween(0, 1);
+		}
+		if (HitLocation(aiGuessSea, playerSea, lastHitCol, lastHitRow)) {
+			if (lastDirectionHit) {
+				lastHitCol = lastHitCol + 1;
+				lastHitRow = lastHitCol;
+			} else {
+				lastHitCol = lastHitCol;
+				lastHitRow = lastHitCol + 1;
+			}
+			
+		} else {
+			lastHitCol = NULL;
+			lastHitRow = NULL;
+		}
+	} else {
+		int x = RandomizeBetween(0, aiSea.size() - 1);
+		int y = RandomizeBetween(0, aiSea.size() - 1);
+		if (HitLocation(aiGuessSea, playerSea, x, y)) {
+			lastHitCol = x;
+			lastHitRow = y;
+		} else {
+			lastHitCol = NULL;
+			lastHitRow = NULL;
+		}
 	}
 }
 

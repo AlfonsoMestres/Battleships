@@ -9,10 +9,13 @@ public:
 	Seas();
 	virtual ~Seas();
 
-	int col, row;
+	int col, row, lastHitRow, lastHitCol;
+	bool lastDirectionHit;
+
+	void AITurn();
+	const void GameState();
 	bool DoAction(string action);
 	const void SeaStatus(std::vector<std::vector<char>>& sea, string seaPrompt);
-	const void GameState();
 
 	std::vector<std::vector<char>> aiSea;
 	std::vector<std::vector<char>> playerSea;
@@ -22,7 +25,7 @@ public:
 private:
 	void ReloadGame();
 	void LaunchMissile();
-	bool LoadShips(int mode);
+	bool LoadGame(int mode);
 	void LoadAIShips(Ship* ship);
 	void LoadPlayerShips(Ship* ship);
 	void InitNewSeas(unsigned int size);

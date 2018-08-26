@@ -20,7 +20,17 @@ int main()
 	//Loop through game render
 	while (1) {
 		seas.GameState();
-		getline(cin, player_input);
+
+		//TODO: Fix this, if you enter another option in the menu, the AI will launch a missile, we need to avoid that
+		//maybe we can put the AITurn inside the Seas and make it private so we throw the AI turn before or after the playar turn
+		if (playerTurn){
+			getline(cin, player_input);
+		} else {
+			seas.AITurn();
+		}
+
+		playerTurn = !playerTurn;
+
 		system("cls");
 
 		if (seas.DoAction(player_input) == true) {
