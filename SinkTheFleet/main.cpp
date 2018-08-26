@@ -23,7 +23,7 @@ int main()
 		getline(cin, player_input);
 		system("cls");
 
-		if (seas.DoAction(player_input)) {
+		if (seas.DoAction(player_input) == true) {
 			system("cls");
 			cout << "You gave up!" << endl;
 			cout << "This is the sea status! Arrrr" << endl;

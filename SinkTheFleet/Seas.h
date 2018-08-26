@@ -26,7 +26,7 @@ private:
 	void LoadAIShips(Ship* ship);
 	void LoadPlayerShips(Ship* ship);
 	void InitNewSeas(unsigned int size);
-	vector<string> ParseAction(string args);
+	bool WinConditionAchieved(std::vector<std::vector<char>>& sea);
 	bool LoadShip(std::vector<std::vector<char>>& sea, Ship* ship, int col, int row, bool direct);
 	bool HitLocation(std::vector<std::vector<char>>& guessSea, std::vector<std::vector<char>>& enemySea, int col, int row);
 

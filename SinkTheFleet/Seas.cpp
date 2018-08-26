@@ -17,10 +17,26 @@ Seas::~Seas()
 {
 }
 
-std::vector<std::vector<char>> CreateBoard(char fill_value, unsigned int seaSize)
-{
+std::vector<std::vector<char>> CreateBoard(char fill_value, unsigned int seaSize) {
 	std::vector<char> vec (seaSize, fill_value);
 	return { seaSize, vec };
+}
+
+//TODO: Something is wrong here, not checking last row or last col, maybe the -1 or somethig
+bool Seas::WinConditionAchieved(std::vector<std::vector<char>>& sea) {
+	//TODO: This should check only a new parameter in the ship class regarding if its sunk or not, this is not optimal
+	//also the ships should have owners to avoid confusions (maybe)
+
+	//Check if theres more ships on the sea that doesnt belong to a letter
+	for (int i = 0; i < sea.size() - 1; i++) {
+		for (int j = 0; j < sea.size() - 1; j++) {
+			if (sea[j][i] != '*' && sea[j][i] != 'X') { //There's a ship in the sea?
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 void Seas::InitNewSeas(unsigned int size) {
@@ -30,7 +46,6 @@ void Seas::InitNewSeas(unsigned int size) {
 	playerGuessSea = CreateBoard('*', size);
 }
 
-//New method, using vector vector chars instead of wrong stuff
 bool Seas::LoadShip(std::vector<std::vector<char>>& sea, Ship* ship, int col, int row, bool direct) {
 	if (direct) {
 		//Vertical
@@ -92,7 +107,6 @@ void Seas::LoadPlayerShips(Ship* ship) {
 		if (!shipsPlaced)
 			std::cout << "Position invalid!" << std::endl;
 	}
-	
 }
 
 bool Seas::LoadShips(int mode) {
@@ -135,21 +149,9 @@ bool Seas::LoadShips(int mode) {
 		ships.push_back(ship4);
 		size = 10;
 		break;
-	case 42: //Meaning of life
-		std::cout << "Prove worthy of this option" << endl;
-		ship1 = new Ship('A', 1);
-		ship2 = new Ship('B', 1);
-		ship3 = new Ship('C', 1);
-		ship4 = new Ship('D', 1);
-		ships.push_back(ship1);
-		ships.push_back(ship2);
-		ships.push_back(ship3);
-		ships.push_back(ship4);
-		size = 20;
-		break;
 	default: //NOPE
 		std::cout << "Not an option" << endl;
-		return false;//Is this ok?
+		return false; //Is this ok?
 	}
 
 	InitNewSeas(size);
@@ -210,12 +212,14 @@ bool Seas::HitLocation(std::vector<std::vector<char>>& guessSea, std::vector<std
 	bool ret = false;
 	if (guessSea[col][row] == '*') {
 		if (enemySea[col][row] != '*') {
-			std::cout << "You hit a ship!" << std::endl;
+			std::cout << "Hit a ship!" << std::endl;
 			guessSea[col][row] = 'X';
 		} else {
 			std::cout << "Nothing there" << std::endl;
 			guessSea[col][row] = 'O';
 		}
+		//Update the sea so we can see the state of their missile siege and thus, check the win condition
+		enemySea[col][row] = 'X';
 		ret = true;
 	} else {
 		std::cout << "This spot has been hit before, chose other location" << std::endl;
@@ -227,6 +231,8 @@ void const Seas::GameState() {
 	std::cout << "    GAME  STATE    " << std::endl;
 	SeaStatus(playerSea, "Your");
 	SeaStatus(playerGuessSea, "Enemy");
+	//For Debug purpouse
+	SeaStatus(aiSea, "Solution");
 	std::cout << "A = Attack | R = Restart | Q = Quit" << std::endl;
 }
 
@@ -243,33 +249,16 @@ void Seas::LaunchMissile() {
 }
 
 bool Seas::DoAction(string action) {
-	if (action == "R" || action == "restart") {
+	string lowerAction = ToLowerCase(action);
+	if (Same(lowerAction,"r") || Same(lowerAction,"restart")) {
 		ReloadGame();
-	} else if (action == "A" || action == "attack") {
+	} else if (Same(lowerAction,"a") || Same(lowerAction,"attack")) {
 		LaunchMissile();
-	}
-	else if (action == "Q" || action == "quit") {
+		//Maybe here the win condition, we need to recheck this when the AI is ready
+		if (WinConditionAchieved(aiSea)) {
+			return true; //TODO: Meanwhile we handle other stuff, we request a quit
+		};
+	} else if (Same(lowerAction,"q")|| Same(lowerAction,"quit")) {
 		return true;
 	}
-}
-
-///Take the input and split them into parts so we can manage them clearly
-vector<string> Seas::ParseAction(string args) //Filling new memory slots with ducplicate content is wasting memory, we should avoid this in next steps and make it directly
-{
-	int len = args.length();
-	vector<string> subArray;
-
-	for (int j = 0, k = 0; j < len; j++) {
-		if (args[j] == ' ') {
-			string ch = args.substr(k, j - k);
-			k = j + 1;
-			subArray.push_back(ch);
-		}
-		if (j == len - 1) {
-			string ch = args.substr(k, j - k + 1);
-			subArray.push_back(ch);
-		}
-	}
-
-	return subArray;
 }

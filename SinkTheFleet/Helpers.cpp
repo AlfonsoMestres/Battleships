@@ -46,6 +46,35 @@ int inputNumberBetween(std::string prompt, int min, int max) {
 	return guess;
 }
 
-std::string ToLowerCase(std::string& input) { //TODO: fix this and use in the menu so we can type whatever we want A or a B or b ..
-	return std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+///Effectively compare two strings
+bool Same(const std::string& a, const std::string& b)
+{
+	return _stricmp(a.c_str(), b.c_str()) == 0;
+}
+
+std::string ToLowerCase(std::string strToConvert)
+{
+	std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), ::tolower);
+	return strToConvert;
+}
+
+///Split a string into words so we can manage them
+std::vector<std::string> ParseAction(std::string args)
+{
+	int len = args.length();
+	std::vector<std::string> subArray;
+
+	for (int j = 0, k = 0; j < len; j++) {
+		if (args[j] == ' ') {
+			std::string ch = args.substr(k, j - k);
+			k = j + 1;
+			subArray.push_back(ch);
+		}
+		if (j == len - 1) {
+			std::string ch = args.substr(k, j - k + 1);
+			subArray.push_back(ch);
+		}
+	}
+
+	return subArray;
 }
