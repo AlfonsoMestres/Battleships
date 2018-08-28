@@ -10,7 +10,7 @@ public:
 	virtual ~Seas();
 
 	int col, row, lastHitRow, lastHitCol;
-	bool lastDirectionHit;
+	bool lastDirectionHit, AIAttackTurn;
 
 	void AITurn();
 	const void GameState();
@@ -29,7 +29,7 @@ private:
 	void LoadAIShips(Ship* ship);
 	void LoadPlayerShips(Ship* ship);
 	void InitNewSeas(unsigned int size);
-	bool WinConditionAchieved(std::vector<std::vector<char>>& sea);
+	bool WinConditionAchieved(std::vector<std::vector<char>>& sea, string prompt);
 	bool LoadShip(std::vector<std::vector<char>>& sea, Ship* ship, int col, int row, bool direct);
 	bool HitLocation(std::vector<std::vector<char>>& guessSea, std::vector<std::vector<char>>& enemySea, int col, int row);
 

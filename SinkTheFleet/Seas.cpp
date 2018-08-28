@@ -29,7 +29,7 @@ void Seas::InitNewSeas(unsigned int size) {
 	playerGuessSea = CreateBoard('*', size);
 }
 
-bool Seas::WinConditionAchieved(std::vector<std::vector<char>>& sea) {
+bool Seas::WinConditionAchieved(std::vector<std::vector<char>>& sea, string prompt) {
 	//TODO: This should check only a new parameter in the ship class regarding if its sunk or not, this is not optimal
 	//also the ships should have owners to avoid confusions (maybe)
 
@@ -42,6 +42,7 @@ bool Seas::WinConditionAchieved(std::vector<std::vector<char>>& sea) {
 		}
 	}
 
+	std::cout << prompt << " WON! " << std::endl;
 	return true;
 }
 
@@ -154,6 +155,7 @@ bool Seas::LoadGame(int mode) {
 	}
 
 	InitNewSeas(size);
+	AIAttackTurn = RandomizeBetween(0, 1);
 
 	for (std::vector<Ship*>::iterator it = ships.begin(); it != ships.end(); ++it)
 		LoadAIShips((Ship*)*it);
@@ -248,45 +250,65 @@ void Seas::LaunchMissile() {
 }
 
 void Seas::AITurn() {
-	if(lastHitRow != NULL) {
-		if (lastDirectionHit == NULL) {
-			lastDirectionHit = RandomizeBetween(0, 1);
-		}
-		if (HitLocation(aiGuessSea, playerSea, lastHitCol, lastHitRow)) {
-			if (lastDirectionHit) {
-				lastHitCol = lastHitCol + 1;
-				lastHitRow = lastHitCol;
-			} else {
-				lastHitCol = lastHitCol;
-				lastHitRow = lastHitCol + 1;
+	bool properMissileLaunched = false;
+
+	// TODO: Fix this properly, we cant accept a turn of the AI if the missile is not correct
+	while (!properMissileLaunched) {
+		properMissileLaunched = HitLocation(playerGuessSea, aiSea, col, row);
+		if (lastHitRow != NULL) {
+			if (lastDirectionHit == NULL) {
+				lastDirectionHit = RandomizeBetween(0, 1);
 			}
-			
-		} else {
-			lastHitCol = NULL;
-			lastHitRow = NULL;
+			if (properMissileLaunched) {
+				if (lastDirectionHit) {
+					lastHitCol = lastHitCol + 1;
+					lastHitRow = lastHitCol;
+				}
+				else {
+					lastHitCol = lastHitCol;
+					lastHitRow = lastHitCol + 1;
+				}
+
+			}
+			else {
+				lastHitCol = NULL;
+				lastHitRow = NULL;
+			}
 		}
-	} else {
-		int x = RandomizeBetween(0, aiSea.size() - 1);
-		int y = RandomizeBetween(0, aiSea.size() - 1);
-		if (HitLocation(aiGuessSea, playerSea, x, y)) {
-			lastHitCol = x;
-			lastHitRow = y;
-		} else {
-			lastHitCol = NULL;
-			lastHitRow = NULL;
+		else {
+			int x = RandomizeBetween(0, aiSea.size() - 1);
+			int y = RandomizeBetween(0, aiSea.size() - 1);
+			if (HitLocation(aiGuessSea, playerSea, x, y)) {
+				lastHitCol = x;
+				lastHitRow = y;
+			}
+			else {
+				lastHitCol = NULL;
+				lastHitRow = NULL;
+			}
 		}
+		system("cls");
 	}
+
+	
 }
 
 bool Seas::DoAction(string action) {
 	string lowerAction = ToLowerCase(action);
+	if (AIAttackTurn) {
+		AITurn(); // TODO: Something wrong here, it launches missiles in the same spot twice and counts as normal shot
+		if (WinConditionAchieved(playerSea, "AI")) {
+			return true;
+		}
+		AIAttackTurn = !AIAttackTurn;
+	}
 	if (Same(lowerAction,"r") || Same(lowerAction,"restart")) {
 		ReloadGame();
 	} else if (Same(lowerAction,"a") || Same(lowerAction,"attack")) {
 		LaunchMissile();
-		//Maybe here the win condition, we need to recheck this when the AI is ready
-		if (WinConditionAchieved(aiSea)) {
-			return true; //TODO: Meanwhile we handle other stuff, we request a quit
+		AIAttackTurn = !AIAttackTurn;
+		if (WinConditionAchieved(aiSea, "Player")) {
+			return true; // TODO: Meanwhile we handle other stuff, we request a quit
 		};
 	} else if (Same(lowerAction,"q")|| Same(lowerAction,"quit")) {
 		return true;
