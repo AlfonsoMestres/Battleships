@@ -16,7 +16,6 @@ Seas::~Seas()
 {
 }
 
-
 std::vector<std::vector<char>> CreateBoard(char fill_value, unsigned int seaSize) {
 	std::vector<char> vec (seaSize, fill_value);
 	return { seaSize, vec };
@@ -219,7 +218,6 @@ bool Seas::HitLocation(std::vector<std::vector<char>>& guessSea, std::vector<std
 			std::cout << "Nothing there" << std::endl;
 			guessSea[col][row] = 'O';
 		}
-		//Update the sea so we can see the state of their missile siege and thus, check the win condition
 		enemySea[col][row] = 'X';
 		ret = true;
 	} else {
@@ -252,53 +250,23 @@ void Seas::LaunchMissile() {
 void Seas::AITurn() {
 	bool properMissileLaunched = false;
 
-	// TODO: Fix this properly, we cant accept a turn of the AI if the missile is not correct
 	while (!properMissileLaunched) {
-		properMissileLaunched = HitLocation(playerGuessSea, aiSea, col, row);
-		if (lastHitRow != NULL) {
-			if (lastDirectionHit == NULL) {
-				lastDirectionHit = RandomizeBetween(0, 1);
-			}
-			if (properMissileLaunched) {
-				if (lastDirectionHit) {
-					lastHitCol = lastHitCol + 1;
-					lastHitRow = lastHitCol;
-				}
-				else {
-					lastHitCol = lastHitCol;
-					lastHitRow = lastHitCol + 1;
-				}
-
-			}
-			else {
-				lastHitCol = NULL;
-				lastHitRow = NULL;
-			}
-		}
-		else {
-			int x = RandomizeBetween(0, aiSea.size() - 1);
-			int y = RandomizeBetween(0, aiSea.size() - 1);
-			if (HitLocation(aiGuessSea, playerSea, x, y)) {
-				lastHitCol = x;
-				lastHitRow = y;
-			}
-			else {
-				lastHitCol = NULL;
-				lastHitRow = NULL;
-			}
-		}
+		int x = RandomizeBetween(0, aiSea.size() - 1);
+		int y = RandomizeBetween(0, aiSea.size() - 1);
+		properMissileLaunched = HitLocation(aiGuessSea, playerSea, x, y);
 		system("cls");
 	}
-
 	
 }
 
 bool Seas::DoAction(string action) {
 	string lowerAction = ToLowerCase(action);
 	if (AIAttackTurn) {
-		AITurn(); // TODO: Something wrong here, it launches missiles in the same spot twice and counts as normal shot
+		AITurn();
 		if (WinConditionAchieved(playerSea, "AI")) {
-			return true;
+			std::cout << "AI Won!" << std::endl;
+			SeaStatus(aiSea, "Enemy");
+			return true; 
 		}
 		AIAttackTurn = !AIAttackTurn;
 	}
@@ -308,7 +276,9 @@ bool Seas::DoAction(string action) {
 		LaunchMissile();
 		AIAttackTurn = !AIAttackTurn;
 		if (WinConditionAchieved(aiSea, "Player")) {
-			return true; // TODO: Meanwhile we handle other stuff, we request a quit
+			std::cout << "Player Won!" << std::endl;
+			SeaStatus(aiSea, "Enemy");
+			return true;
 		};
 	} else if (Same(lowerAction,"q")|| Same(lowerAction,"quit")) {
 		return true;

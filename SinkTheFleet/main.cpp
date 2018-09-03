@@ -20,10 +20,8 @@ int main()
 		system("cls");
 
 		if (seas.DoAction(player_input) == true) {
+			std::cout << "Game finished!" << std::endl;
 			system("cls");
-			cout << "You gave up!" << endl;
-			cout << "This is the enemy sea status! Arrrr" << endl;
-			seas.SeaStatus(seas.aiSea, "AI");
 			break;
 		}
 
